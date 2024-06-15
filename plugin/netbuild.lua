@@ -14,6 +14,8 @@ vim.api.nvim_create_user_command('NetBuild', function(args)
         require('netbuild').clean()
     elseif command == 'rebuild' then
         require('netbuild').rebuild()
+    elseif command == 'toggle' then
+        require('netbuild').toggle()
     elseif command == 'errors' then
         require('netbuild').errors()
     else
@@ -23,7 +25,7 @@ end, {
     nargs = 1,
     complete = function(arglead, _, _)
         local completions = {}
-        local options = { 'build', 'run', 'debug', 'test', 'restore', 'clean', 'rebuild', 'errors' }
+        local options = { 'build', 'run', 'debug', 'test', 'restore', 'clean', 'rebuild', 'errors', 'toggle' }
 
         for _, opt in ipairs(options) do
             if opt:match('^' .. arglead) then

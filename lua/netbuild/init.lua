@@ -46,4 +46,8 @@ M.errors = function()
     utils._run_workflow(M._opts.terminal_name, require 'workflows.errors')
 end
 
+M.toggle = function()
+    utils._toggle_terminal(M._opts.terminal_name)
+end
+
 return M

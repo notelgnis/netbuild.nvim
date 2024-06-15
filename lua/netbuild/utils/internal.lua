@@ -91,6 +91,50 @@ M._open_terminal = function(terminal_name)
     M._terminal_buf = terminal_buf
 end
 
+M._toggle_terminal = function(terminal_name)
+    local windows = vim.api.nvim_list_wins()
+    local terminal_found = false
+    local terminal_buf = nil
+    local terminal_win = nil
+
+    for _, win in ipairs(windows) do
+        local buf = vim.api.nvim_win_get_buf(win)
+        local name = vim.api.nvim_buf_get_name(buf)
+        if name:sub(-#terminal_name) == terminal_name then
+            terminal_found = true
+            terminal_buf = buf
+            terminal_win = win
+            break
+        end
+    end
+
+    local bufs = vim.api.nvim_list_bufs()
+
+    for _, buf in ipairs(bufs) do
+        local name = vim.api.nvim_buf_get_name(buf)
+        if name:sub(-#terminal_name) == terminal_name then
+            terminal_found = true
+            terminal_buf = buf
+            break
+        end
+    end
+
+    if not terminal_found then
+        vim.cmd 'split | terminal'
+        terminal_buf = vim.api.nvim_get_current_buf()
+        vim.api.nvim_buf_set_name(terminal_buf, terminal_name)
+    else
+        if terminal_buf and not terminal_win then
+            vim.cmd 'split'
+            vim.api.nvim_set_current_buf(terminal_buf)
+        else
+            if terminal_win then
+                vim.api.nvim_win_hide(terminal_win)
+            end
+        end
+    end
+end
+
 M._is_prompt_ready = function(output)
     if output then
         local lastLine = s._get_last_non_empty_line(output)
@@ -190,6 +234,7 @@ M._show_errors = function(errors)
                                 vim.fn.clearmatches(self.state.winid)
                                 vim.fn.matchaddpos('Search', { { entry.lnum, 1, -1 } })
                             end))
+                            vim.api.nvim_set_option_value('number', true, { scope = 'local', win = self.state.winid })
                         end,
                     })
                 end,
